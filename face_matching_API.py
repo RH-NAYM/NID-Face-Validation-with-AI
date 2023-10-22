@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 import numpy as np
 import face_recognition
 from io import BytesIO
-import base64  # Import base64
+import base64 
 from fastapi import FastAPI
 from pydantic import BaseModel
 import asyncio
@@ -22,7 +22,6 @@ logger.addHandler(file_handler)
 total_done = 0
 total_error = 0
 
-# Adjust the face recognition tolerance here (default is 0.6)
 FACE_RECOGNITION_TOLERANCE = 0.6
 
 def get_bd_time():
@@ -37,7 +36,6 @@ def pil_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 def compare_faces_from_urls(image_url_1, image_url_2, tolerance=FACE_RECOGNITION_TOLERANCE):
-    # Function to find a face, crop it, and get its encoding from an image URL
     def get_face_info_from_url(image_url):
         response = requests.get(image_url)
         if response.status_code == 200:
@@ -45,34 +43,25 @@ def compare_faces_from_urls(image_url_1, image_url_2, tolerance=FACE_RECOGNITION
             image = np.array(image)
             face_locations = face_recognition.face_locations(image)
             if face_locations:
-                # Convert face_locations to the expected format
                 face_locations = [(top, right, bottom, left) for (top, right, bottom, left) in face_locations]
-                # Assuming there's only one face, crop it and get its encoding
                 top, right, bottom, left = face_locations[0]
                 face_encoding = face_recognition.face_encodings(image, [face_locations[0]])[0]
-
-                # Create an ImageDraw object to draw rectangles on the image
                 img_with_rectangles = Image.fromarray(image)
                 draw = ImageDraw.Draw(img_with_rectangles)
                 draw.rectangle([left-20, top-50, right+20, bottom], outline="red", width=5)
 
                 return face_encoding, img_with_rectangles
         return None, None
-
-    # Get face encodings and images with rectangles from the image URLs
     face_encoding_1, img_with_rectangles_1 = get_face_info_from_url(image_url_1)
     face_encoding_2, img_with_rectangles_2 = get_face_info_from_url(image_url_2)
 
     if face_encoding_1 is not None and face_encoding_2 is not None:
-        # Compare the face encodings with the specified tolerance
         are_same_person = face_recognition.compare_faces([face_encoding_1], face_encoding_2, tolerance=tolerance)[0]
 
         if are_same_person:
             result = "Same Person"
         else:
             result = "Different Person"
-
-        # Convert images with rectangles to base64
         img1_base64 = pil_image_to_base64(img_with_rectangles_1)
         img2_base64 = pil_image_to_base64(img_with_rectangles_2)
 
