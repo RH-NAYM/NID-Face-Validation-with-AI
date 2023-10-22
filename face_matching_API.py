@@ -48,7 +48,7 @@ def compare_faces_from_urls(image_url_1, image_url_2, tolerance=FACE_RECOGNITION
                 face_encoding = face_recognition.face_encodings(image, [face_locations[0]])[0]
                 img_with_rectangles = Image.fromarray(image)
                 draw = ImageDraw.Draw(img_with_rectangles)
-                draw.rectangle([left-20, top-50, right+20, bottom], outline="red", width=5)
+                draw.rectangle([left-20, top-50, right+20, bottom], outline="green", width=5)
 
                 return face_encoding, img_with_rectangles
         return None, None
@@ -76,6 +76,7 @@ class Item(BaseModel):
     img2: str
 
 async def process_item(item: Item):
+    # print("asdasda",item)
     try:
         result, img1_base64, img2_base64 = compare_faces_from_urls(item.img1, item.img2)
         return {"AI": result, "img1": img1_base64, "img2": img2_base64}
@@ -84,6 +85,7 @@ async def process_item(item: Item):
 
 @app.post("/face")
 async def create_items(items: Item):
+    # print(items)
     try:
         result = await process_item(items)
         r= {"AI":result["AI"]}
