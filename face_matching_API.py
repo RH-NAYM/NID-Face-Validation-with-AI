@@ -67,7 +67,7 @@ def compare_faces_from_urls(image_url_1, image_url_2, tolerance=FACE_RECOGNITION
 
         return result, img1_base64, img2_base64
 
-    return "No face", None, None
+    return "No Face Detected", None, None
 
 app = FastAPI()
 
